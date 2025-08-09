@@ -4,14 +4,6 @@ console.log('VMD-AI Meeting Companion background script loaded');
 let isRecording = false;
 let currentSession = null;
 
-// Simple icon data URL for notifications
-const ICON_DATA_URL = 'data:image/svg+xml;base64,' + btoa(`
-<svg width="48" height="48" xmlns="http://www.w3.org/2000/svg">
-  <rect width="48" height="48" fill="#4CAF50" rx="6"/>
-  <text x="24" y="32" text-anchor="middle" fill="white" font-family="Arial" font-size="16" font-weight="bold">AI</text>
-</svg>
-`);
-
 // Handle extension installation
 chrome.runtime.onInstalled.addListener((details) => {
   console.log('Extension installed:', details.reason);
@@ -19,7 +11,6 @@ chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
     chrome.notifications.create({
       type: 'basic',
-      iconUrl: 'icon48.png',
       title: 'VMD-AI Meeting Companion',
       message: 'Welcome! Click the extension icon to get started.'
     });
@@ -219,25 +210,37 @@ let activeServerUrl = null;
 
 // Test server connection on startup
 async function testServerConnection() {
-  console.log('Testing server connections...');
+  console.log('🔍 Testing server connections...');
 
   for (const url of SERVER_URLS) {
     try {
       console.log(`Testing: ${url}`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
       const response = await fetch(`${url}/health`, {
         method: 'GET',
-        headers: { 'Accept': 'application/json' }
+        headers: { 'Accept': 'application/json' },
+        signal: controller.signal
       });
 
+      clearTimeout(timeoutId);
+
       if (response.ok) {
+        const data = await response.json();
         activeServerUrl = url;
         console.log(`✅ Server connection successful: ${url}`);
+        console.log(`📊 Server info:`, data);
         return;
       } else {
         console.log(`❌ Server responded with error: ${response.status} for ${url}`);
       }
     } catch (error) {
-      console.log(`❌ Server connection failed for ${url}:`, error.message);
+      if (error.name === 'AbortError') {
+        console.log(`⏱️ Timeout connecting to ${url}`);
+      } else {
+        console.log(`❌ Server connection failed for ${url}:`, error.message);
+      }
     }
   }
 
