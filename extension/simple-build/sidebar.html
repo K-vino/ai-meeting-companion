@@ -14,7 +14,7 @@
       display: flex;
       flex-direction: column;
     }
-    
+
     .header {
       display: flex;
       align-items: center;
@@ -24,7 +24,7 @@
       color: white;
       border-radius: 12px 12px 0 0;
     }
-    
+
     .title {
       font-size: 14px;
       font-weight: 600;
@@ -32,12 +32,12 @@
       align-items: center;
       gap: 8px;
     }
-    
+
     .header-actions {
       display: flex;
       gap: 4px;
     }
-    
+
     .header-button {
       width: 24px;
       height: 24px;
@@ -51,34 +51,34 @@
       justify-content: center;
       font-size: 12px;
     }
-    
+
     .header-button:hover {
       background: rgba(255, 255, 255, 0.3);
     }
-    
+
     .content {
       flex: 1;
       padding: 16px;
       overflow-y: auto;
     }
-    
+
     .section {
       margin-bottom: 24px;
     }
-    
+
     .section-header {
       display: flex;
       align-items: center;
       gap: 8px;
       margin-bottom: 12px;
     }
-    
+
     .section-title {
       font-size: 14px;
       font-weight: 600;
       color: #212121;
     }
-    
+
     .section-content {
       background: #fafafa;
       border-radius: 8px;
@@ -86,7 +86,7 @@
       min-height: 80px;
       border: 1px solid #e0e0e0;
     }
-    
+
     .empty-state {
       display: flex;
       flex-direction: column;
@@ -97,14 +97,14 @@
       font-size: 14px;
       text-align: center;
     }
-    
+
     .transcript-text {
       font-size: 14px;
       line-height: 1.5;
       color: #212121;
       white-space: pre-wrap;
     }
-    
+
     .action-item {
       display: flex;
       align-items: flex-start;
@@ -115,17 +115,17 @@
       margin-bottom: 8px;
       border: 1px solid #e0e0e0;
     }
-    
+
     .action-item:last-child {
       margin-bottom: 0;
     }
-    
+
     .action-text {
       font-size: 14px;
       color: #212121;
       flex: 1;
     }
-    
+
     .sentiment-indicator {
       display: inline-flex;
       align-items: center;
@@ -136,38 +136,38 @@
       font-weight: 500;
       color: white;
     }
-    
+
     .sentiment-positive {
       background: #4CAF50;
     }
-    
+
     .sentiment-neutral {
       background: #2196F3;
     }
-    
+
     .sentiment-negative {
       background: #F44336;
     }
-    
+
     .jargon-term {
       margin-bottom: 12px;
     }
-    
+
     .jargon-term:last-child {
       margin-bottom: 0;
     }
-    
+
     .jargon-word {
       font-weight: 600;
       color: #4CAF50;
     }
-    
+
     .jargon-definition {
       font-size: 13px;
       color: #757575;
       margin-top: 4px;
     }
-    
+
     .status-indicator {
       width: 8px;
       height: 8px;
@@ -175,7 +175,7 @@
       background: #4CAF50;
       animation: pulse 2s infinite;
     }
-    
+
     @keyframes pulse {
       0% {
         opacity: 1;
@@ -249,6 +249,34 @@
         </div>
       </div>
     </div>
+    <div class="section">
+      <div class="section-header">
+        <span>🧠</span>
+        <div class="section-title">AI Summary</div>
+      </div>
+      <div class="section-content">
+        <div id="summary-content" class="empty-state">Generate a concise summary of the discussion</div>
+        <div style="margin-top:8px; display:flex; gap:8px;">
+          <button id="summary-generate" class="header-button" title="Generate Summary" style="width:auto; padding:6px 10px;">Generate</button>
+          <button id="summary-speak" class="header-button" title="Speak Summary" style="width:auto; padding:6px 10px;">Speak</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <span>💡</span>
+        <div class="section-title">Meeting Tips</div>
+      </div>
+      <div class="section-content">
+        <div id="tips-content" class="empty-state">Get real-time tips to improve your meeting</div>
+        <div style="margin-top:8px; display:flex; gap:8px;">
+          <button id="tips-generate" class="header-button" title="Generate Tips" style="width:auto; padding:6px 10px;">Generate Tips</button>
+          <button id="tips-speak" class="header-button" title="Speak Tips" style="width:auto; padding:6px 10px;">Speak</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <script src="sidebar.js"></script>

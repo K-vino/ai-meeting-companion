@@ -17,7 +17,7 @@ chrome.runtime.onInstalled.addListener((details) => {
 // Handle messages from popup and content scripts
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log('Background received message:', message);
-  
+
   switch (message.type) {
     case 'GET_STATE':
       sendResponse({
@@ -29,19 +29,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         }
       });
       break;
-      
+
     case 'START_RECORDING':
       handleStartRecording(message.tabId)
         .then(() => sendResponse({ success: true }))
         .catch(error => sendResponse({ success: false, error: error.message }));
       return true; // Keep message channel open for async response
-      
+
     case 'STOP_RECORDING':
       handleStopRecording()
         .then(() => sendResponse({ success: true }))
         .catch(error => sendResponse({ success: false, error: error.message }));
       return true;
-      
+
     case 'TOGGLE_SIDEBAR':
       const targetTabId = message.tabId || (sender && sender.tab && sender.tab.id);
       if (targetTabId) {
@@ -52,7 +52,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ success: false, error: 'No active tab found' });
       }
       return true;
-      
+
     default:
       sendResponse({ success: false, error: 'Unknown message type' });
   }
@@ -72,19 +72,19 @@ async function checkMeetingTab(tab) {
     tab.url.includes('teams.microsoft.com') ||
     tab.url.includes('teams.live.com')
   );
-  
+
   if (isMeetingUrl) {
     // Update badge to indicate meeting detected
     chrome.action.setBadgeText({
       text: '●',
       tabId: tab.id
     });
-    
+
     chrome.action.setBadgeBackgroundColor({
       color: '#4CAF50',
       tabId: tab.id
     });
-    
+
     console.log('Meeting detected on tab:', tab.id);
   } else {
     // Clear badge for non-meeting tabs
@@ -99,7 +99,7 @@ async function handleStartRecording(tabId) {
   if (isRecording) {
     throw new Error('Recording already in progress');
   }
-  
+
   const tab = await chrome.tabs.get(tabId);
   const isMeetingUrl = tab.url && (
     tab.url.includes('zoom.us') ||
@@ -107,11 +107,11 @@ async function handleStartRecording(tabId) {
     tab.url.includes('teams.microsoft.com') ||
     tab.url.includes('teams.live.com')
   );
-  
+
   if (!isMeetingUrl) {
     throw new Error('Not a meeting tab');
   }
-  
+
   // Create session
   currentSession = {
     id: `session_${Date.now()}`,
@@ -119,22 +119,23 @@ async function handleStartRecording(tabId) {
     platform: detectPlatform(tab.url),
     tabId: tabId
   };
-  
+
   isRecording = true;
-  
+
   // Update badge
   chrome.action.setBadgeText({
     text: 'REC',
     tabId: tabId
   });
-  
+
   chrome.action.setBadgeBackgroundColor({
     color: '#F44336',
     tabId: tabId
   });
-  
+
   // Notify content script
   try {
+    await ensureContentScript(tabId);
     await chrome.tabs.sendMessage(tabId, {
       type: 'RECORDING_STARTED',
       session: currentSession
@@ -142,7 +143,7 @@ async function handleStartRecording(tabId) {
   } catch (error) {
     console.log('Could not notify content script:', error);
   }
-  
+
   console.log('Recording started for session:', currentSession.id);
 }
 
@@ -150,26 +151,27 @@ async function handleStopRecording() {
   if (!isRecording || !currentSession) {
     return;
   }
-  
+
   isRecording = false;
-  
+
   // Update session
   currentSession.endTime = new Date().toISOString();
-  
+
   // Update badge
   if (currentSession.tabId) {
     chrome.action.setBadgeText({
       text: '●',
       tabId: currentSession.tabId
     });
-    
+
     chrome.action.setBadgeBackgroundColor({
       color: '#4CAF50',
       tabId: currentSession.tabId
     });
-    
+
     // Notify content script
     try {
+      await ensureContentScript(currentSession.tabId);
       await chrome.tabs.sendMessage(currentSession.tabId, {
         type: 'RECORDING_STOPPED',
         session: currentSession
@@ -178,13 +180,14 @@ async function handleStopRecording() {
       console.log('Could not notify content script:', error);
     }
   }
-  
+
   console.log('Recording stopped for session:', currentSession.id);
   currentSession = null;
 }
 
 async function handleToggleSidebar(tabId) {
   try {
+    await ensureContentScript(tabId);
     await chrome.tabs.sendMessage(tabId, {
       type: 'TOGGLE_SIDEBAR'
     });
@@ -198,6 +201,27 @@ function detectPlatform(url) {
   if (url.includes('meet.google.com')) return 'google_meet';
   if (url.includes('teams.microsoft.com') || url.includes('teams.live.com')) return 'microsoft_teams';
   return 'unknown';
+}
+
+// Ensure content script is injected and ready
+async function ensureContentScript(tabId) {
+  try {
+    // Try a simple ping first
+    await chrome.tabs.sendMessage(tabId, { type: 'PING' });
+    return true;
+  } catch (e) {
+    // If no receiver, programmatically inject the content script
+    try {
+      await chrome.scripting.executeScript({
+        target: { tabId },
+        files: ['content.js']
+      });
+      return true;
+    } catch (injectErr) {
+      console.log('Failed to inject content script:', injectErr);
+      throw injectErr;
+    }
+  }
 }
 
 // Server configuration
