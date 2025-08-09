@@ -43,8 +43,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       return true;
       
     case 'TOGGLE_SIDEBAR':
-      if (sender && sender.tab && sender.tab.id) {
-        handleToggleSidebar(sender.tab.id)
+      const targetTabId = message.tabId || (sender && sender.tab && sender.tab.id);
+      if (targetTabId) {
+        handleToggleSidebar(targetTabId)
           .then(() => sendResponse({ success: true }))
           .catch(error => sendResponse({ success: false, error: error.message }));
       } else {
