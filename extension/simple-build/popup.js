@@ -55,11 +55,20 @@ async function checkServerStatus() {
     const serverUrl = extensionState?.serverUrl;
 
     if (!serverUrl || serverUrl === 'No server available') {
-      updateServerStatus('No Server', 'error');
+      updateServerStatus('Local Only', 'warning');
       return;
     }
 
-    const response = await fetch(`${serverUrl}/health`);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+    const response = await fetch(`${serverUrl}/health`, {
+      signal: controller.signal,
+      headers: { 'Accept': 'application/json' }
+    });
+
+    clearTimeout(timeoutId);
+
     if (response.ok) {
       const data = await response.json();
       updateServerStatus('Connected', 'success');
@@ -68,7 +77,13 @@ async function checkServerStatus() {
       updateServerStatus('Error', 'error');
     }
   } catch (error) {
-    updateServerStatus('Disconnected', 'error');
+    if (error.name === 'AbortError') {
+      updateServerStatus('Timeout', 'error');
+    } else if (error.message.includes('CORS')) {
+      updateServerStatus('CORS Error', 'error');
+    } else {
+      updateServerStatus('Disconnected', 'error');
+    }
     console.error('Server check failed:', error);
   }
 }
@@ -178,18 +193,18 @@ async function startRecording() {
   if (!currentTab || !currentTab.id) {
     throw new Error('No active tab found');
   }
-  
+
   const response = await chrome.runtime.sendMessage({
     type: 'START_RECORDING',
     tabId: currentTab.id
   });
-  
-  if (response.success) {
+
+  if (response && response.success) {
     extensionState.isRecording = true;
     updateUI();
     showSuccess('Recording started successfully!');
   } else {
-    throw new Error(response.error || 'Failed to start recording');
+    throw new Error((response && response.error) || 'Failed to start recording');
   }
 }
 
@@ -197,13 +212,13 @@ async function stopRecording() {
   const response = await chrome.runtime.sendMessage({
     type: 'STOP_RECORDING'
   });
-  
-  if (response.success) {
+
+  if (response && response.success) {
     extensionState.isRecording = false;
     updateUI();
     showSuccess('Recording stopped successfully!');
   } else {
-    throw new Error(response.error || 'Failed to stop recording');
+    throw new Error((response && response.error) || 'Failed to stop recording');
   }
 }
 
@@ -212,20 +227,20 @@ async function handleSidebarAction() {
     if (!currentTab || !currentTab.id) {
       throw new Error('No active tab found');
     }
-    
+
     const response = await chrome.runtime.sendMessage({
       type: 'TOGGLE_SIDEBAR',
       tabId: currentTab.id
     });
-    
-    if (response.success) {
+
+    if (response && response.success) {
       showSuccess('Sidebar toggled!');
     } else {
-      throw new Error(response.error || 'Failed to toggle sidebar');
+      throw new Error((response && response.error) || 'Failed to toggle sidebar');
     }
   } catch (error) {
     console.error('Sidebar action error:', error);
-    showError(error.message);
+    showError(error.message || 'Unknown error occurred');
   }
 }
 

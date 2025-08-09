@@ -1,14 +1,13 @@
 {
   "manifest_version": 3,
   "name": "VMD-AI Meeting Companion",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "VMD-AI powered meeting companion with real-time transcription and intelligent insights",
   "permissions": [
     "tabs",
     "activeTab",
     "scripting",
-    "storage",
-    "notifications"
+    "storage"
   ],
   "host_permissions": [
     "*://*.zoom.us/*",

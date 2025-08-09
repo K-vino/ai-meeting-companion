@@ -7,13 +7,10 @@ let currentSession = null;
 // Handle extension installation
 chrome.runtime.onInstalled.addListener((details) => {
   console.log('Extension installed:', details.reason);
-  
+
   if (details.reason === 'install') {
-    chrome.notifications.create({
-      type: 'basic',
-      title: 'VMD-AI Meeting Companion',
-      message: 'Welcome! Click the extension icon to get started.'
-    });
+    console.log('🎉 VMD-AI Meeting Companion installed successfully!');
+    console.log('💡 Click the extension icon to get started.');
   }
 });
 
@@ -46,9 +43,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       return true;
       
     case 'TOGGLE_SIDEBAR':
-      handleToggleSidebar(sender.tab.id)
-        .then(() => sendResponse({ success: true }))
-        .catch(error => sendResponse({ success: false, error: error.message }));
+      if (sender && sender.tab && sender.tab.id) {
+        handleToggleSidebar(sender.tab.id)
+          .then(() => sendResponse({ success: true }))
+          .catch(error => sendResponse({ success: false, error: error.message }));
+      } else {
+        sendResponse({ success: false, error: 'No active tab found' });
+      }
       return true;
       
     default:
@@ -200,10 +201,11 @@ function detectPlatform(url) {
 
 // Server configuration
 const SERVER_URLS = [
-  'https://vmd-ai-meeting-companion.herokuapp.com',
-  'https://vmd-ai-meeting-companion.railway.app',
-  'https://vmd-ai-meeting-companion.onrender.com',
-  'http://localhost:3000' // Fallback for local development
+  'http://localhost:3000' // Local development server
+  // Add your deployed server URLs here when ready:
+  // 'https://your-app.herokuapp.com',
+  // 'https://your-app.railway.app',
+  // 'https://your-app.onrender.com'
 ];
 
 let activeServerUrl = null;
@@ -216,11 +218,14 @@ async function testServerConnection() {
     try {
       console.log(`Testing: ${url}`);
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
 
       const response = await fetch(`${url}/health`, {
         method: 'GET',
-        headers: { 'Accept': 'application/json' },
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
         signal: controller.signal
       });
 
@@ -238,6 +243,8 @@ async function testServerConnection() {
     } catch (error) {
       if (error.name === 'AbortError') {
         console.log(`⏱️ Timeout connecting to ${url}`);
+      } else if (error.message.includes('CORS')) {
+        console.log(`🚫 CORS error for ${url} - server not configured for extensions`);
       } else {
         console.log(`❌ Server connection failed for ${url}:`, error.message);
       }
