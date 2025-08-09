@@ -1,0 +1,66 @@
+{
+  "name": "ai-meeting-companion",
+  "version": "1.0.0",
+  "description": "AI-powered meeting companion with real-time transcription and intelligent insights",
+  "private": true,
+  "workspaces": [
+    "extension",
+    "server",
+    "shared"
+  ],
+  "scripts": {
+    "install:all": "npm install && npm run install:extension && npm run install:server",
+    "install:extension": "cd extension && npm install",
+    "install:server": "cd server && npm install",
+    "build": "npm run build:shared && npm run build:extension && npm run build:server",
+    "build:shared": "cd shared && npm run build",
+    "build:extension": "cd extension && npm run build",
+    "build:server": "cd server && npm run build",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:extension\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:extension": "cd extension && npm run dev",
+    "test": "npm run test:server && npm run test:extension",
+    "test:server": "cd server && npm test",
+    "test:extension": "cd extension && npm test",
+    "lint": "npm run lint:server && npm run lint:extension",
+    "lint:server": "cd server && npm run lint",
+    "lint:extension": "cd extension && npm run lint",
+    "clean": "rimraf extension/dist server/dist shared/dist",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "rimraf": "^5.0.5"
+  },
+  "lint-staged": {
+    "*.{js,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,css}": [
+      "prettier --write"
+    ]
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/ai-meeting-companion.git"
+  },
+  "keywords": [
+    "chrome-extension",
+    "ai",
+    "meeting",
+    "transcription",
+    "notes",
+    "openai",
+    "whisper",
+    "real-time"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}

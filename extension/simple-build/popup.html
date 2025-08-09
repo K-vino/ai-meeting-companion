@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VMD-AI Meeting Companion</title>
+  <style>
+    body {
+      width: 380px;
+      min-height: 500px;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #ffffff;
+    }
+    
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      border-bottom: 1px solid #e0e0e0;
+      background: #f5f5f5;
+    }
+    
+    .title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #212121;
+    }
+    
+    .content {
+      padding: 16px;
+    }
+    
+    .status-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    
+    .status-card {
+      padding: 12px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      background: #fafafa;
+    }
+    
+    .status-title {
+      font-size: 12px;
+      font-weight: 500;
+      color: #757575;
+      margin-bottom: 4px;
+    }
+    
+    .status-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: #212121;
+    }
+    
+    .status-card.success .status-value {
+      color: #4CAF50;
+    }
+    
+    .status-card.error .status-value {
+      color: #F44336;
+    }
+    
+    .status-card.warning .status-value {
+      color: #FF9800;
+    }
+    
+    .action-button {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 12px;
+      transition: all 0.2s ease;
+    }
+    
+    .action-button.primary {
+      background: #4CAF50;
+      color: white;
+    }
+    
+    .action-button.primary:hover {
+      background: #388E3C;
+    }
+    
+    .action-button.error {
+      background: #F44336;
+      color: white;
+    }
+    
+    .action-button.error:hover {
+      background: #D32F2F;
+    }
+    
+    .action-button.secondary {
+      background: #e0e0e0;
+      color: #212121;
+    }
+    
+    .action-button.secondary:hover {
+      background: #bdbdbd;
+    }
+    
+    .action-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    .action-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .info-message {
+      padding: 12px;
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      border-radius: 8px;
+      color: #856404;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+    
+    .error-message {
+      padding: 12px;
+      background: #f8d7da;
+      border: 1px solid #f5c6cb;
+      border-radius: 8px;
+      color: #721c24;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+    
+    .footer {
+      padding: 12px 16px;
+      border-top: 1px solid #e0e0e0;
+      background: #fafafa;
+      text-align: center;
+      font-size: 12px;
+      color: #757575;
+    }
+    
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 200px;
+    }
+    
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 2px solid #e0e0e0;
+      border-top: 2px solid #4CAF50;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title">VMD-AI Meeting Companion</div>
+  </div>
+  
+  <div class="content">
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+    </div>
+    
+    <div id="main-content" style="display: none;">
+      <div id="error-message" class="error-message" style="display: none;"></div>
+      
+      <div class="status-grid">
+        <div class="status-card" id="server-status">
+          <div class="status-title">Server</div>
+          <div class="status-value">Checking...</div>
+        </div>
+        
+        <div class="status-card" id="platform-status">
+          <div class="status-title">Platform</div>
+          <div class="status-value">Detecting...</div>
+        </div>
+      </div>
+      
+      <div id="meeting-actions">
+        <button id="main-action" class="action-button primary">
+          Start Recording
+        </button>
+        
+        <div class="action-grid">
+          <button id="sidebar-action" class="action-button secondary">
+            Toggle Sidebar
+          </button>
+          
+          <button id="analysis-action" class="action-button secondary" disabled>
+            Live Analysis
+          </button>
+        </div>
+      </div>
+      
+      <div id="not-meeting" class="info-message" style="display: none;">
+        Navigate to a supported meeting platform (Zoom, Google Meet, or Microsoft Teams) to start recording.
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer">
+    VMD-AI Meeting Companion v1.0.0
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>

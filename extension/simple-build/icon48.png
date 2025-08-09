@@ -1,0 +1,6 @@
+<svg width="48" height="48" xmlns="http://www.w3.org/2000/svg">
+    <rect width="48" height="48" fill="#4CAF50" rx="6"/>
+    <circle cx="24" cy="16.799999999999997" r="7.199999999999999" fill="white"/>
+    <rect x="19.200000000000003" y="24" width="9.600000000000001" height="14.399999999999999" fill="white" rx="0.96"/>
+    <text x="24" y="40.8" text-anchor="middle" fill="white" font-family="Arial" font-size="7.199999999999999" font-weight="bold">AI</text>
+  </svg>
