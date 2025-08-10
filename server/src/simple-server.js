@@ -243,10 +243,7 @@ app.post('/api/analysis/tips', async (req, res) => {
   }
 });
 
-    },
-    timestamp: new Date().toISOString()
-  });
-});
+
 
 // Get supported languages
 app.get('/api/transcription/languages', (req, res) => {

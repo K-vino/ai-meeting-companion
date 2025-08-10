@@ -23,7 +23,6 @@ function setupEventListeners() {
   document.getElementById('tips-generate').addEventListener('click', generateTips);
   document.getElementById('tips-speak').addEventListener('click', speakTips);
 
-
   // Listen for messages from content script
   window.addEventListener('message', (event) => {
     const message = event.data;
@@ -52,7 +51,6 @@ function handleRecordingStarted(session) {
   isRecording = true;
   updateTranscript('Recording started... Listening for audio...');
 
-  // Start demo updates
   setTimeout(() => {
     if (isRecording) {
       simulateTranscriptUpdates();
@@ -86,7 +84,6 @@ function handleAnalysisUpdate(analysis) {
 
 function updateTranscript(text) {
   const content = document.getElementById('transcript-content');
-
   if (text && text.trim()) {
     content.innerHTML = `<div class="transcript-text">${text}</div>`;
   } else {
@@ -96,7 +93,6 @@ function updateTranscript(text) {
 
 function updateActionItems(actionItems) {
   const content = document.getElementById('action-items-content');
-
   if (actionItems && actionItems.length > 0) {
     content.innerHTML = actionItems.map(item => `
       <div class="action-item">
@@ -111,14 +107,11 @@ function updateActionItems(actionItems) {
 
 function updateSentiment(sentiment) {
   const content = document.getElementById('sentiment-content');
-
   if (sentiment && sentiment.overall) {
     const { positive, negative, neutral } = sentiment.overall;
     const max = Math.max(positive, negative, neutral);
-
     let sentimentLabel = 'Neutral';
     let sentimentClass = 'sentiment-neutral';
-
     if (max === positive) {
       sentimentLabel = 'Positive';
       sentimentClass = 'sentiment-positive';
@@ -126,12 +119,7 @@ function updateSentiment(sentiment) {
       sentimentLabel = 'Negative';
       sentimentClass = 'sentiment-negative';
     }
-
-    content.innerHTML = `
-      <div class="sentiment-indicator ${sentimentClass}">
-        💭 ${sentimentLabel}
-      </div>
-    `;
+    content.innerHTML = `<div class="sentiment-indicator ${sentimentClass}">💭 ${sentimentLabel}</div>`;
   } else {
     content.innerHTML = '<div class="empty-state">Analyzing sentiment...</div>';
   }
@@ -139,7 +127,6 @@ function updateSentiment(sentiment) {
 
 function updateJargon(jargonTerms) {
   const content = document.getElementById('jargon-content');
-
   if (jargonTerms && jargonTerms.length > 0) {
     content.innerHTML = jargonTerms.map(term => `
       <div class="jargon-term">
@@ -152,9 +139,8 @@ function updateJargon(jargonTerms) {
   }
 }
 
-// Demo functionality
+// Demo
 function startDemo() {
-  // Show demo content after a delay
   setTimeout(() => {
     if (!isRecording) {
       showDemoContent();
@@ -164,35 +150,14 @@ function startDemo() {
 
 function showDemoContent() {
   updateTranscript('Welcome to AI Meeting Companion! This is a demo of the live transcription feature.');
-
   updateActionItems([
-    {
-      text: 'Review quarterly performance metrics',
-      assignee: 'Team Lead'
-    },
-    {
-      text: 'Schedule follow-up meeting for next week',
-      assignee: 'Project Manager'
-    }
+    { text: 'Review quarterly performance metrics', assignee: 'Team Lead' },
+    { text: 'Schedule follow-up meeting for next week', assignee: 'Project Manager' }
   ]);
-
-  updateSentiment({
-    overall: {
-      positive: 0.7,
-      neutral: 0.25,
-      negative: 0.05
-    }
-  });
-
+  updateSentiment({ overall: { positive: 0.7, neutral: 0.25, negative: 0.05 } });
   updateJargon([
-    {
-      term: 'API',
-      definition: 'Application Programming Interface - a set of protocols for building software applications'
-    },
-    {
-      term: 'MVP',
-      definition: 'Minimum Viable Product - a product with just enough features to satisfy early customers'
-    }
+    { term: 'API', definition: 'Application Programming Interface - a set of protocols for building software applications' },
+    { term: 'MVP', definition: 'Minimum Viable Product - a product with just enough features to satisfy early customers' }
   ]);
 }
 
@@ -204,78 +169,86 @@ function simulateTranscriptUpdates() {
     'We need to schedule a follow-up meeting to discuss the MVP features.',
     'Are there any questions or concerns about the timeline?'
   ];
-
   let index = 0;
   const interval = setInterval(() => {
     if (!isRecording || index >= demoTexts.length) {
       clearInterval(interval);
       return;
     }
-
-    transcriptSegments.push({
-      id: `demo_${Date.now()}_${index}`,
-      text: demoTexts[index],
-      timestamp: new Date().toISOString()
-    });
-
+    transcriptSegments.push({ id: `demo_${Date.now()}_${index}`, text: demoTexts[index], timestamp: new Date().toISOString() });
     updateTranscript(transcriptSegments.map(s => s.text).join(' '));
-
-    // Simulate analysis updates
     if (index === 2) {
-      updateJargon([
-        {
-          term: 'API',
-          definition: 'Application Programming Interface - a set of protocols for building software applications'
-        }
-      ]);
+      updateJargon([{ term: 'API', definition: 'Application Programming Interface - a set of protocols for building software applications' }]);
     }
-
     if (index === 3) {
-      updateActionItems([
-        {
-          text: 'Schedule follow-up meeting to discuss MVP features',
-          assignee: 'Project Manager'
-        }
-      ]);
-
+      updateActionItems([{ text: 'Schedule follow-up meeting to discuss MVP features', assignee: 'Project Manager' }]);
       updateJargon([
-        {
-          term: 'API',
-          definition: 'Application Programming Interface - a set of protocols for building software applications'
-        },
-        {
-// AI Features: Summary and Tips with TTS
-async function getActiveServerUrl() {
-  try {
-    const state = await chrome.runtime.sendMessage({ type: 'GET_STATE' });
-    if (state && state.success && state.data && state.data.serverUrl && state.data.serverUrl.startsWith('http')) {
-      return state.data.serverUrl;
+        { term: 'API', definition: 'Application Programming Interface - a set of protocols for building software applications' },
+        { term: 'MVP', definition: 'Minimum Viable Product - a product with just enough features to satisfy early customers' }
+      ]);
     }
-  } catch (e) {
-    console.log('Failed to get server URL', e);
-  }
-  return null;
+    index++;
+  }, 3000);
+}
+
+// ===== AI Features: Summary and Tips with TTS =====
+async function getActiveServerUrl() {
+  return new Promise((resolve) => {
+    const timeoutId = setTimeout(() => {
+      window.removeEventListener('message', onMsg);
+      resolve(null);
+    }, 3000);
+
+    function onMsg(event) {
+      const msg = event && event.data;
+      if (msg && msg.type === 'SERVER_URL_RESPONSE') {
+        clearTimeout(timeoutId);
+        window.removeEventListener('message', onMsg);
+        console.log('Received server URL:', msg.serverUrl);
+        resolve(msg.serverUrl || null);
+      }
+    }
+
+    window.addEventListener('message', onMsg);
+    console.log('Requesting server URL from content script');
+    // Ask content script (parent) for the active server URL
+    window.parent.postMessage({ type: 'GET_SERVER_URL' }, '*');
+  });
 }
 
 async function generateSummary() {
+  console.log('generateSummary called');
   const container = document.getElementById('summary-content');
   container.textContent = 'Generating summary...';
+
   const serverUrl = await getActiveServerUrl();
+  console.log('Using server URL:', serverUrl);
+
   const transcript = transcriptSegments.map(s => s.text).join(' ').slice(0, 8000);
+  console.log('Transcript length:', transcript.length);
+
+  const url = `${serverUrl || 'http://localhost:3000'}/api/analysis/summary`;
+  console.log('Fetching from:', url);
+
   try {
-    const res = await fetch(`${serverUrl || 'http://localhost:3000'}/api/analysis/summary`, {
+    const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ transcript })
     });
+    console.log('Response status:', res.status);
+
     const data = await res.json();
+    console.log('Response data:', data);
+
     if (data && data.success) {
       container.innerHTML = `<div class="transcript-text">${(data.data.summary || '').replace(/\n/g, '<br/>')}</div>`;
     } else {
       container.textContent = data.error || 'Failed to generate summary';
     }
   } catch (e) {
-    container.textContent = 'Error generating summary';
+    console.error('Error generating summary:', e);
+    container.textContent = 'Error generating summary: ' + e.message;
   }
 }
 
@@ -321,14 +294,4 @@ function speakTips() {
   utter.rate = 1.0;
   speechSynthesis.cancel();
   speechSynthesis.speak(utter);
-}
-
-          term: 'MVP',
-          definition: 'Minimum Viable Product - a product with just enough features to satisfy early customers'
-        }
-      ]);
-    }
-
-    index++;
-  }, 3000);
 }
