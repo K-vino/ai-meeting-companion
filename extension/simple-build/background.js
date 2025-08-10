@@ -226,7 +226,8 @@ async function ensureContentScript(tabId) {
 
 // Server configuration
 const SERVER_URLS = [
-  'http://localhost:3000' // Local development server
+  'http://localhost:9000', // VMD-AI Gemini Server
+  'http://localhost:3000'  // Fallback server
   // Add your deployed server URLs here when ready:
   // 'https://your-app.herokuapp.com',
   // 'https://your-app.railway.app',

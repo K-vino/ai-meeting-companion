@@ -113,7 +113,9 @@ function showSidebar() {
         const state = await chrome.runtime.sendMessage({ type: 'GET_STATE' });
         const url = state && state.success && state.data && state.data.serverUrl ? state.data.serverUrl : null;
         window.postMessage({ type: 'SERVER_URL_RESPONSE', serverUrl: url }, '*');
+        console.log('Content script bridged server URL:', url);
       } catch (e) {
+        console.log('Content script bridge error:', e);
         window.postMessage({ type: 'SERVER_URL_RESPONSE', serverUrl: null }, '*');
       }
     }

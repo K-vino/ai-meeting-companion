@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VMD-AI Live Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            height: 100vh;
+            gap: 0;
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .main-content {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .status-card {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #4CAF50;
+            transition: transform 0.2s ease;
+        }
+
+        .status-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .status-title {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .feature-section {
+            margin-bottom: 25px;
+        }
+
+        .feature-section h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .feature-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .feature-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-working { background: #4CAF50; color: white; }
+        .status-testing { background: #FF9800; color: white; }
+        .status-error { background: #F44336; color: white; }
+
+        .test-button {
+            width: 100%;
+            padding: 8px 12px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s ease;
+        }
+
+        .test-button:hover {
+            background: #1976D2;
+        }
+
+        .test-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .live-output {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            height: calc(100vh - 40px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .output-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .clear-button {
+            padding: 8px 16px;
+            background: #F44336;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .output-content {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            border: 1px solid #e9ecef;
+        }
+
+        .log-entry {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            border-left: 4px solid #ddd;
+        }
+
+        .log-success {
+            background: #d4edda;
+            border-left-color: #4CAF50;
+            color: #155724;
+        }
+
+        .log-error {
+            background: #f8d7da;
+            border-left-color: #F44336;
+            color: #721c24;
+        }
+
+        .log-info {
+            background: #d1ecf1;
+            border-left-color: #2196F3;
+            color: #0c5460;
+        }
+
+        .log-warning {
+            background: #fff3cd;
+            border-left-color: #FF9800;
+            color: #856404;
+        }
+
+        .timestamp {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .auto-test-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .auto-test-button {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.2s ease;
+        }
+
+        .auto-test-button:hover {
+            background: #45a049;
+        }
+
+        .auto-test-button.stop {
+            background: #F44336;
+        }
+
+        .auto-test-button.stop:hover {
+            background: #da190b;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .testing {
+            animation: pulse 1s infinite;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="sidebar">
+            <div class="header">
+                <h1>🚀 VMD-AI</h1>
+                <p>Live Testing Dashboard</p>
+            </div>
+
+            <div class="status-grid">
+                <div class="status-card">
+                    <div class="status-title">Extension</div>
+                    <div class="status-value" id="extension-status">Checking...</div>
+                </div>
+                <div class="status-card">
+                    <div class="status-title">Server</div>
+                    <div class="status-value" id="server-status">Checking...</div>
+                </div>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value" id="tests-passed">0</div>
+                    <div class="metric-label">Tests Passed</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="tests-failed">0</div>
+                    <div class="metric-label">Tests Failed</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="response-time">0ms</div>
+                    <div class="metric-label">Avg Response</div>
+                </div>
+            </div>
+
+            <div class="feature-section">
+                <h3>🧠 AI Features</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-header">
+                            <div class="feature-title">AI Summary</div>
+                            <div class="status-badge status-working">READY</div>
+                        </div>
+                        <button class="test-button" onclick="testFeature('summary')">Test Now</button>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-header">
+                            <div class="feature-title">Meeting Tips</div>
+                            <div class="status-badge status-working">READY</div>
+                        </div>
+                        <button class="test-button" onclick="testFeature('tips')">Test Now</button>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-header">
+                            <div class="feature-title">Live Insights</div>
+                            <div class="status-badge status-working">READY</div>
+                        </div>
+                        <button class="test-button" onclick="testFeature('insights')">Test Now</button>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-header">
+                            <div class="feature-title">Smart Actions</div>
+                            <div class="status-badge status-working">READY</div>
+                        </div>
+                        <button class="test-button" onclick="testFeature('actions')">Test Now</button>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-header">
+                            <div class="feature-title">Clean Transcript</div>
+                            <div class="status-badge status-working">READY</div>
+                        </div>
+                        <button class="test-button" onclick="testFeature('cleanup')">Test Now</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-section">
+                <h3>⚡ Quick Actions</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <button class="test-button" onclick="testTTS()">🔊 Test TTS</button>
+                    </div>
+                    <div class="feature-card">
+                        <button class="test-button" onclick="testExport()">📁 Test Export</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="live-output">
+                <div class="output-header">
+                    <div class="output-title">🔴 Live Output</div>
+                    <button class="clear-button" onclick="clearOutput()">Clear</button>
+                </div>
+
+                <div class="auto-test-controls">
+                    <button class="auto-test-button" onclick="runAllTests()">🧪 Run All Tests</button>
+                    <button class="auto-test-button" onclick="startAutoTesting()">🔄 Auto Test</button>
+                    <button class="auto-test-button stop" onclick="stopAutoTesting()">⏹ Stop</button>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+
+                <div class="output-content" id="live-output">
+                    <div class="log-entry log-info">
+                        <div class="timestamp">[INIT]</div>
+                        🚀 VMD-AI Live Dashboard initialized<br>
+                        Ready for testing...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="live-dashboard.js"></script>
+</body>
+</html>

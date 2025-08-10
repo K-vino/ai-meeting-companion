@@ -54,7 +54,11 @@
     {
       "resources": [
         "sidebar.html",
-        "sidebar.js"
+        "sidebar.js",
+        "test-suite.html",
+        "test-suite.js",
+        "live-dashboard.html",
+        "live-dashboard.js"
       ],
       "matches": [
         "*://*.zoom.us/*",

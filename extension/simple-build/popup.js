@@ -173,6 +173,8 @@ function updateActionButtons() {
 function setupEventListeners() {
   document.getElementById('main-action').addEventListener('click', handleMainAction);
   document.getElementById('sidebar-action').addEventListener('click', handleSidebarAction);
+  document.getElementById('live-dashboard-action').addEventListener('click', handleLiveDashboardAction);
+  document.getElementById('test-suite-action').addEventListener('click', handleTestSuiteAction);
   document.getElementById('analysis-action').addEventListener('click', handleAnalysisAction);
 }
 
@@ -241,6 +243,30 @@ async function handleSidebarAction() {
   } catch (error) {
     console.error('Sidebar action error:', error);
     showError(error.message || 'Unknown error occurred');
+  }
+}
+
+async function handleLiveDashboardAction() {
+  try {
+    // Open live dashboard in a new tab
+    const dashboardUrl = chrome.runtime.getURL('live-dashboard.html');
+    await chrome.tabs.create({ url: dashboardUrl });
+    showSuccess('Live Dashboard opened!');
+  } catch (error) {
+    console.error('Live dashboard action error:', error);
+    showError('Failed to open live dashboard: ' + error.message);
+  }
+}
+
+async function handleTestSuiteAction() {
+  try {
+    // Open test suite in a new tab
+    const testSuiteUrl = chrome.runtime.getURL('test-suite.html');
+    await chrome.tabs.create({ url: testSuiteUrl });
+    showSuccess('Test suite opened in new tab!');
+  } catch (error) {
+    console.error('Test suite action error:', error);
+    showError('Failed to open test suite: ' + error.message);
   }
 }
 

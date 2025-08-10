@@ -187,6 +187,28 @@
         opacity: 1;
       }
     }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+    }
   </style>
 </head>
 <body>
@@ -273,6 +295,63 @@
         <div style="margin-top:8px; display:flex; gap:8px;">
           <button id="tips-generate" class="header-button" title="Generate Tips" style="width:auto; padding:6px 10px;">Generate Tips</button>
           <button id="tips-speak" class="header-button" title="Speak Tips" style="width:auto; padding:6px 10px;">Speak</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <span>🎯</span>
+        <div class="section-title">Live Insights</div>
+      </div>
+      <div class="section-content">
+        <div id="insights-content" class="empty-state">Real-time meeting effectiveness insights</div>
+        <div style="margin-top:8px; display:flex; gap:8px;">
+          <button id="insights-generate" class="header-button" title="Generate Insights" style="width:auto; padding:6px 10px;">Analyze</button>
+          <button id="insights-speak" class="header-button" title="Speak Insights" style="width:auto; padding:6px 10px;">Speak</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <span>📋</span>
+        <div class="section-title">Smart Actions</div>
+      </div>
+      <div class="section-content">
+        <div id="smart-actions-content" class="empty-state">AI-extracted action items with assignments</div>
+        <div style="margin-top:8px; display:flex; gap:8px;">
+          <button id="actions-extract" class="header-button" title="Extract Actions" style="width:auto; padding:6px 10px;">Extract</button>
+          <button id="actions-export" class="header-button" title="Export Actions" style="width:auto; padding:6px 10px;">Export</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <span>🧹</span>
+        <div class="section-title">Clean Transcript</div>
+      </div>
+      <div class="section-content">
+        <div id="cleanup-content" class="empty-state">Professional transcript formatting</div>
+        <div style="margin-top:8px; display:flex; gap:8px;">
+          <button id="cleanup-generate" class="header-button" title="Clean Transcript" style="width:auto; padding:6px 10px;">Clean</button>
+          <button id="cleanup-copy" class="header-button" title="Copy Clean Text" style="width:auto; padding:6px 10px;">Copy</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <span>⚡</span>
+        <div class="section-title">Quick Actions</div>
+      </div>
+      <div class="section-content">
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <button id="auto-summary" class="header-button" title="Auto Summary" style="width:auto; padding:6px 10px; background:#2196F3;">Auto Summary</button>
+          <button id="save-notes" class="header-button" title="Save Notes" style="width:auto; padding:6px 10px; background:#FF9800;">Save Notes</button>
+          <button id="share-link" class="header-button" title="Share Link" style="width:auto; padding:6px 10px; background:#9C27B0;">Share</button>
+          <button id="download-all" class="header-button" title="Download All" style="width:auto; padding:6px 10px; background:#4CAF50;">Download</button>
         </div>
       </div>
     </div>

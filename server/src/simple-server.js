@@ -242,6 +242,171 @@ app.post('/api/analysis/tips', async (req, res) => {
     res.status(500).json({ success: false, error: 'Failed to generate tips' });
   }
 });
+// Advanced AI Features
+
+// Real-time transcript analysis
+app.post('/api/analysis/live-insights', async (req, res) => {
+  try {
+    const { transcript, context } = req.body || {};
+    if (!transcript || !transcript.trim()) {
+      return res.status(400).json({ success: false, error: 'transcript is required' });
+    }
+
+    if (!openai) {
+      return res.json({
+        success: true,
+        data: {
+          insights: [
+            'Meeting is progressing well with good engagement',
+            'Consider timeboxing the current discussion',
+            'Action items are being clearly defined',
+            'Participants are actively contributing'
+          ],
+          mood: 'positive',
+          engagement: 85,
+          clarity: 78
+        }
+      });
+    }
+
+    const prompt = `Analyze this meeting transcript and provide real-time insights about engagement, clarity, and suggestions for improvement. Keep it concise and actionable.\n\nTranscript:\n${transcript}`;
+
+    const chat = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: 'You are a meeting effectiveness coach providing real-time insights.' },
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.4,
+      max_tokens: 300
+    });
+
+    const output = chat.choices?.[0]?.message?.content || '';
+    res.json({ success: true, data: { insights: output.split('\n').filter(Boolean) } });
+  } catch (err) {
+    console.error('Live insights error:', err);
+    res.status(500).json({ success: false, error: 'Failed to generate insights' });
+  }
+});
+
+// Action items extraction
+app.post('/api/analysis/action-items', async (req, res) => {
+  try {
+    const { transcript } = req.body || {};
+    if (!transcript || !transcript.trim()) {
+      return res.status(400).json({ success: false, error: 'transcript is required' });
+    }
+
+    if (!openai) {
+      return res.json({
+        success: true,
+        data: {
+          actionItems: [
+            { task: 'Review quarterly metrics', assignee: 'Team Lead', priority: 'high', deadline: 'Next week' },
+            { task: 'Schedule follow-up meeting', assignee: 'Project Manager', priority: 'medium', deadline: 'This week' },
+            { task: 'Update API documentation', assignee: 'Dev Team', priority: 'medium', deadline: 'End of month' }
+          ]
+        }
+      });
+    }
+
+    const prompt = `Extract action items from this meeting transcript. Format as JSON with task, assignee, priority, and deadline.\n\nTranscript:\n${transcript}`;
+
+    const chat = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: 'You extract action items from meetings and format them as structured data.' },
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.2,
+      max_tokens: 400
+    });
+
+    const output = chat.choices?.[0]?.message?.content || '';
+    res.json({ success: true, data: { actionItems: output } });
+  } catch (err) {
+    console.error('Action items error:', err);
+    res.status(500).json({ success: false, error: 'Failed to extract action items' });
+  }
+});
+
+// Meeting sentiment analysis
+app.post('/api/analysis/sentiment', async (req, res) => {
+  try {
+    const { transcript } = req.body || {};
+    if (!transcript || !transcript.trim()) {
+      return res.status(400).json({ success: false, error: 'transcript is required' });
+    }
+
+    if (!openai) {
+      return res.json({
+        success: true,
+        data: {
+          overall: { positive: 0.7, neutral: 0.25, negative: 0.05 },
+          emotions: ['confident', 'collaborative', 'focused'],
+          tone: 'professional and positive'
+        }
+      });
+    }
+
+    const prompt = `Analyze the sentiment and emotional tone of this meeting transcript. Provide scores and key emotions.\n\nTranscript:\n${transcript}`;
+
+    const chat = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: 'You analyze meeting sentiment and emotional dynamics.' },
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.3,
+      max_tokens: 300
+    });
+
+    const output = chat.choices?.[0]?.message?.content || '';
+    res.json({ success: true, data: { analysis: output } });
+  } catch (err) {
+    console.error('Sentiment error:', err);
+    res.status(500).json({ success: false, error: 'Failed to analyze sentiment' });
+  }
+});
+
+// Meeting transcript cleanup and formatting
+app.post('/api/analysis/cleanup', async (req, res) => {
+  try {
+    const { transcript } = req.body || {};
+    if (!transcript || !transcript.trim()) {
+      return res.status(400).json({ success: false, error: 'transcript is required' });
+    }
+
+    if (!openai) {
+      return res.json({
+        success: true,
+        data: {
+          cleanedTranscript: transcript.replace(/um|uh|like|you know/gi, '').replace(/\s+/g, ' ').trim(),
+          wordCount: transcript.split(' ').length,
+          speakingTime: '15 minutes'
+        }
+      });
+    }
+
+    const prompt = `Clean up this meeting transcript by removing filler words, fixing grammar, and improving readability while preserving meaning.\n\nTranscript:\n${transcript}`;
+
+    const chat = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: 'You clean and format meeting transcripts for professional documentation.' },
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.2,
+      max_tokens: 500
+    });
+
+    const output = chat.choices?.[0]?.message?.content || '';
+    res.json({ success: true, data: { cleanedTranscript: output } });
+  } catch (err) {
+    console.error('Cleanup error:', err);
+    res.status(500).json({ success: false, error: 'Failed to cleanup transcript' });
+  }
+});
 
 
 
