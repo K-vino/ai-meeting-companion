@@ -4,7 +4,7 @@
 async function testSummary() {
   try {
     console.log('Testing AI Summary endpoint...');
-    const response = await fetch('http://localhost:3000/api/analysis/summary', {
+    const response = await fetch('http://localhost:9000/api/analysis/summary', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -22,7 +22,7 @@ async function testSummary() {
 async function testTips() {
   try {
     console.log('\nTesting AI Tips endpoint...');
-    const response = await fetch('http://localhost:3000/api/analysis/tips', {
+    const response = await fetch('http://localhost:9000/api/analysis/tips', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -40,7 +40,7 @@ async function testTips() {
 async function testInsights() {
   try {
     console.log('\nTesting Live Insights endpoint...');
-    const response = await fetch('http://localhost:3000/api/analysis/live-insights', {
+    const response = await fetch('http://localhost:9000/api/analysis/live-insights', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -58,7 +58,7 @@ async function testInsights() {
 async function testActionItems() {
   try {
     console.log('\nTesting Action Items endpoint...');
-    const response = await fetch('http://localhost:3000/api/analysis/action-items', {
+    const response = await fetch('http://localhost:9000/api/analysis/action-items', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -76,7 +76,7 @@ async function testActionItems() {
 async function testCleanup() {
   try {
     console.log('\nTesting Cleanup endpoint...');
-    const response = await fetch('http://localhost:3000/api/analysis/cleanup', {
+    const response = await fetch('http://localhost:9000/api/analysis/cleanup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
